@@ -18,6 +18,7 @@ final class CharacterViewController: UIViewController {
         let stackView = UIStackView()
         stackView.axis = .horizontal
         stackView.alignment = .center
+        stackView.distribution = .fillEqually
         return stackView
     }()
     private let pageLabel: UILabel = {
@@ -59,7 +60,10 @@ final class CharacterViewController: UIViewController {
         
         view.backgroundColor = .white
         
+        pageLabel.text = String(counter)
+        
         setupTableView()
+        setupPageNavigation()
         
         let url = UrlAdresses.allCharacters.rawValue
         loadData(from: url)
@@ -70,11 +74,13 @@ final class CharacterViewController: UIViewController {
         charactersTableView.backgroundColor = .white
         charactersTableView.separatorColor = .white
         
+        charactersTableView.dataSource = self
+        charactersTableView.delegate = self
+        
         view.addSubview(charactersTableView)
         
         charactersTableView.snp.makeConstraints { make in
-            make.top.equalTo(view.snp.bottom).offset(10)
-            make.leading.trailing.equalToSuperview()
+            make.top.leading.trailing.equalToSuperview()
             make.bottom.equalToSuperview().inset(40)
         }
     }
@@ -83,11 +89,16 @@ final class CharacterViewController: UIViewController {
         [previousPageButton, pageLabel, nextPageButton].forEach {
             pageNavigationStackView.addArrangedSubview($0)
         }
+        
         view.addSubview(pageNavigationStackView)
+        
+        previousPageButton.addTarget(self, action: #selector(previousBtnTapped), for: .touchUpInside)
+        nextPageButton.addTarget(self, action: #selector(nextBtnTapped), for: .touchUpInside)
         
         pageNavigationStackView.snp.makeConstraints { make in
             make.top.equalTo(charactersTableView.snp.bottom)
-            make.leading.trailing.bottom.equalToSuperview()
+            make.leading.equalToSuperview().offset(20)
+            make.trailing.bottom.equalToSuperview().inset(20)
         }
     }
     
@@ -101,24 +112,27 @@ final class CharacterViewController: UIViewController {
                     charactersArray = result.results
                     charactersInfo = result.info
                     charactersTableView.reloadData()
-                    charactersTableView.scrollToRow(at: IndexPath(row: 0, section: 0),
-                                                    at: .top, animated: true)
+                    print(charactersArray.count)
                 }
             }
         }
     }
     
-    @IBAction func nextBtnTapped(_ sender: Any) {
+    @objc private func nextBtnTapped() {
         if let nextUrl = charactersInfo.next {
             loadData(from: nextUrl)
+            charactersTableView.scrollToRow(at: IndexPath(row: 0, section: 0),
+                                            at: .top, animated: true)
             counter += 1
             pageLabel.text = String(counter)
         }
     }
     
-    @IBAction func prevBtnTapped(_ sender: Any) {
+    @objc private func previousBtnTapped() {
         if let prevUrl = charactersInfo.prev {
             loadData(from: prevUrl)
+            charactersTableView.scrollToRow(at: IndexPath(row: 0, section: 0),
+                                            at: .top, animated: true)
             counter -= 1
             pageLabel.text = String(counter)
         }
@@ -132,41 +146,44 @@ extension CharacterViewController: UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "characterCell") as? CharacterTableViewCell
-        if let cell {
-            let model = charactersArray[indexPath.row]
+        guard let cell = tableView.dequeueReusableCell(withIdentifier: "characterCell")
+                as? CharacterTableViewCell else { return UITableViewCell() }
+        
+        let model = charactersArray[indexPath.row]
+        
+        let imageUrl = URL(string: model.image)
+        let processor = DownsamplingImageProcessor(size: cell.characterImageView.bounds.size)
+        |> RoundCornerImageProcessor(cornerRadius: 10)
+        cell.characterImageView.kf.indicatorType = .activity
+        cell.characterImageView.kf.setImage(
+            with: imageUrl,
+            options: [
+                .processor(processor),
+                .scaleFactor(UIScreen.main.scale),
+                .transition(.fade(1)),
+                .cacheOriginalImage
+            ])
+        
+        let statusColor = getStatusColor(for: model.status)
+        cell.statusColorView.backgroundColor = statusColor
+        cell.characterNameLabel.text = model.name
+        cell.characterLocationLabel.text = model.location.name
+        cell.characterStatusLabel.text = model.status.rawValue
 
-            cell.characterNameLabel.text = model.name
-            cell.characterLocationLabel.text = model.location.name
-            cell.characterStatusLabel.text = model.status.rawValue
-            
-            let imageUrl = URL(string: model.image)
-            let processor = DownsamplingImageProcessor(size: cell.characterImageView.bounds.size)
-            |> RoundCornerImageProcessor(cornerRadius: 10)
-            cell.characterImageView.kf.indicatorType = .activity
-            cell.characterImageView.kf.setImage(
-                with: imageUrl,
-                options: [
-                    .processor(processor),
-                    .scaleFactor(UIScreen.main.scale),
-                    .transition(.fade(1)),
-                    .cacheOriginalImage
-                ])
-            
-            var color: UIColor
-            switch model.status {
-            case .alive:
-                color = .green
-            case .dead:
-                color = .red
-            case .unknown:
-                color = .yellow
-            }
-            
-            cell.statusColorView.backgroundColor = color
+        return cell
+    }
+    
+    private func getStatusColor(for status: Characters.Status) -> UIColor {
+        var color: UIColor
+        switch status {
+        case .alive:
+            color = .green
+        case .dead:
+            color = .red
+        case .unknown:
+            color = .yellow
         }
-
-        return cell ?? UITableViewCell()
+        return color
     }
 }
 

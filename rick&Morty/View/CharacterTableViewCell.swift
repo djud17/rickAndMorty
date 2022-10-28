@@ -11,8 +11,10 @@ import SnapKit
 final class CharacterTableViewCell: UITableViewCell {
     private let characterView: UIView = {
         let view = UIView()
-        view.backgroundColor = .lightGray
+        view.backgroundColor = .white
         view.layer.cornerRadius = 10
+        view.layer.borderColor = UIColor.lightGray.cgColor
+        view.layer.borderWidth = 3
         return view
     }()
     let characterImageView: UIImageView = {
@@ -39,14 +41,18 @@ final class CharacterTableViewCell: UITableViewCell {
     let statusColorView: UIView = {
         let view = UIView()
         view.backgroundColor = .black
-        view.layer.cornerRadius = view.frame.size.width / 2
+        view.layer.cornerRadius = 8
         return view
     }()
     
-    convenience override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
-        self.init(style: style, reuseIdentifier: reuseIdentifier)
+    override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
+        super.init(style: style, reuseIdentifier: reuseIdentifier)
         
         setupView()
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
     }
     
     private func setupView() {
@@ -59,7 +65,8 @@ final class CharacterTableViewCell: UITableViewCell {
         contentView.addSubview(characterView)
         
         characterView.snp.makeConstraints { make in
-            make.top.leading.trailing.bottom.equalToSuperview()
+            make.top.leading.equalToSuperview().offset(5)
+            make.trailing.bottom.equalToSuperview().inset(5)
         }
         
         characterImageView.snp.makeConstraints { make in
@@ -76,6 +83,7 @@ final class CharacterTableViewCell: UITableViewCell {
         statusColorView.snp.makeConstraints { make in
             make.top.equalTo(characterNameLabel.snp.bottom).offset(10)
             make.leading.equalTo(characterImageView.snp.trailing).offset(10)
+            make.height.width.equalTo(16)
         }
         
         characterStatusLabel.snp.makeConstraints { make in

@@ -60,9 +60,6 @@ final class CharacterDetailViewController: UIViewController {
         
         nameLabel.text = newCharacter.name
         
-        statusView.layer.cornerRadius = statusView.frame.size.width / 2
-        statusView.layer.masksToBounds = true
-        
         var color: UIColor
         switch newCharacter.status {
         case .alive:
@@ -72,8 +69,8 @@ final class CharacterDetailViewController: UIViewController {
         default:
             color = .yellow
         }
-        statusView.backgroundColor = color
         
+        statusView.backgroundColor = color
         statusLabel.text = newCharacter.status.rawValue
         speciesLabel.text = newCharacter.species
         locationLabel.text = newCharacter.location.name

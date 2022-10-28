@@ -14,10 +14,14 @@ final class CharacterCollectionViewCell: UICollectionViewCell {
         return imageView
     }()
     
-    convenience override init(frame: CGRect) {
-        self.init(frame: frame)
+    override init(frame: CGRect) {
+        super.init(frame: frame)
         
         setupView()
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
     }
     
     private func setupView() {
