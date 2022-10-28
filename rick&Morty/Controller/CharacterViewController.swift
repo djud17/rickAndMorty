@@ -6,77 +6,176 @@
 //
 
 import UIKit
+import Kingfisher
 
-class CharacterViewController: UIViewController {
-    @IBOutlet weak var charactersTableView: UITableView!
+enum UrlAdresses: String {
+    case allCharacters = "https://rickandmortyapi.com/api/character"
+}
+
+final class CharacterViewController: UIViewController {
+    private let charactersTableView = UITableView()
+    private let pageNavigationStackView: UIStackView = {
+        let stackView = UIStackView()
+        stackView.axis = .horizontal
+        stackView.alignment = .center
+        return stackView
+    }()
+    private let pageLabel: UILabel = {
+        let label = UILabel()
+        label.font = .systemFont(ofSize: 15)
+        label.textAlignment = .center
+        label.textColor = .black
+        return label
+    }()
+    private let previousPageButton: UIButton = {
+        let button = UIButton()
+        button.setTitle("Previous", for: .normal)
+        button.setTitleColor(.blue, for: .normal)
+        button.setTitleColor(.blue.withAlphaComponent(0.5), for: .highlighted)
+        return button
+    }()
+    private let nextPageButton: UIButton = {
+        let button = UIButton()
+        button.setTitle("Next", for: .normal)
+        button.setTitleColor(.blue, for: .normal)
+        button.setTitleColor(.blue.withAlphaComponent(0.5), for: .highlighted)
+        return button
+    }()
     
-    var characters: [Character] = []
-    let apiClient: ApiClient = ApiClientImpl()
+    private var charactersInfo = Characters.Info(next: "", prev: "")
+    private var counter = 1
+    private var charactersArray: [Characters.Character] = []
+    private let apiClient: ApiClient = ApiClientImpl()
 
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        setupView()
+    }
+    
+    private func setupView() {
         navigationItem.title = "Rick & Morty"
         navigationController?.navigationBar.prefersLargeTitles = true
         
-        loadData()
+        view.backgroundColor = .white
+        
+        setupTableView()
+        
+        let url = UrlAdresses.allCharacters.rawValue
+        loadData(from: url)
     }
     
-    func loadData() {
-        apiClient.getAllCharacters(completion: { result in
-            DispatchQueue.main.async {
-                self.characters = result.results
-                self.charactersTableView.reloadData()
-            }
-        })
-    }
-}
-
-extension CharacterViewController: UITableViewDataSource, UITableViewDelegate {
-    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        characters.count
-    }
-    
-    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "characterCell") as! CharacterTableViewCell
-        let model = characters[indexPath.row]
+    private func setupTableView() {
+        charactersTableView.register(CharacterTableViewCell.self, forCellReuseIdentifier: "characterCell")
+        charactersTableView.backgroundColor = .white
+        charactersTableView.separatorColor = .white
         
-        cell.characterNameLabel.text = model.name
-        cell.characterLocationLabel.text = model.location.name
-        cell.characterStatusLabel.text = model.status.rawValue
-        cell.characterImageView.load(URL(string: model.image)!)
+        view.addSubview(charactersTableView)
         
-        switch model.status {
-        case .alive: cell.statusColorView.backgroundColor = UIColor.green
-        case .dead: cell.statusColorView.backgroundColor = UIColor.red
-        default: cell.statusColorView.backgroundColor = UIColor.yellow
+        charactersTableView.snp.makeConstraints { make in
+            make.top.equalTo(view.snp.bottom).offset(10)
+            make.leading.trailing.equalToSuperview()
+            make.bottom.equalToSuperview().inset(40)
         }
-
-        return cell
     }
     
-    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        let storyboard = UIStoryboard(name: "Main", bundle: .main)
-        let viewController = storyboard.instantiateViewController(identifier: "characterDetail") as! CharacterDetailViewController
+    private func setupPageNavigation() {
+        [previousPageButton, pageLabel, nextPageButton].forEach {
+            pageNavigationStackView.addArrangedSubview($0)
+        }
+        view.addSubview(pageNavigationStackView)
         
-        viewController.character = characters[indexPath.row]
-        
-        navigationController?.pushViewController(viewController, animated: true)
-        tableView.deselectRow(at: indexPath, animated: true)
+        pageNavigationStackView.snp.makeConstraints { make in
+            make.top.equalTo(charactersTableView.snp.bottom)
+            make.leading.trailing.bottom.equalToSuperview()
+        }
     }
-}
-
-extension UIImageView {
-    func load(_ url: URL) {
-        DispatchQueue.global().async { [weak self] in
-            if let data = try? Data(contentsOf: url) {
-                if let image = UIImage(data: data) {
-                    DispatchQueue.main.async {
-                        self?.image = image
-                    }
+    
+    private func loadData(from url: String) {
+        apiClient.getAllCharacters(from: url) { result in
+            DispatchQueue.main.async { [unowned self] in
+                switch result {
+                case .failure(let error):
+                    print(error.localizedDescription)
+                case .success(let result):
+                    charactersArray = result.results
+                    charactersInfo = result.info
+                    charactersTableView.reloadData()
+                    charactersTableView.scrollToRow(at: IndexPath(row: 0, section: 0),
+                                                    at: .top, animated: true)
                 }
             }
         }
     }
+    
+    @IBAction func nextBtnTapped(_ sender: Any) {
+        if let nextUrl = charactersInfo.next {
+            loadData(from: nextUrl)
+            counter += 1
+            pageLabel.text = String(counter)
+        }
+    }
+    
+    @IBAction func prevBtnTapped(_ sender: Any) {
+        if let prevUrl = charactersInfo.prev {
+            loadData(from: prevUrl)
+            counter -= 1
+            pageLabel.text = String(counter)
+        }
+    }
+    
 }
 
+extension CharacterViewController: UITableViewDataSource {
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        charactersArray.count
+    }
+    
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let cell = tableView.dequeueReusableCell(withIdentifier: "characterCell") as? CharacterTableViewCell
+        if let cell {
+            let model = charactersArray[indexPath.row]
+
+            cell.characterNameLabel.text = model.name
+            cell.characterLocationLabel.text = model.location.name
+            cell.characterStatusLabel.text = model.status.rawValue
+            
+            let imageUrl = URL(string: model.image)
+            let processor = DownsamplingImageProcessor(size: cell.characterImageView.bounds.size)
+            |> RoundCornerImageProcessor(cornerRadius: 10)
+            cell.characterImageView.kf.indicatorType = .activity
+            cell.characterImageView.kf.setImage(
+                with: imageUrl,
+                options: [
+                    .processor(processor),
+                    .scaleFactor(UIScreen.main.scale),
+                    .transition(.fade(1)),
+                    .cacheOriginalImage
+                ])
+            
+            var color: UIColor
+            switch model.status {
+            case .alive:
+                color = .green
+            case .dead:
+                color = .red
+            case .unknown:
+                color = .yellow
+            }
+            
+            cell.statusColorView.backgroundColor = color
+        }
+
+        return cell ?? UITableViewCell()
+    }
+}
+
+extension CharacterViewController: UITableViewDelegate {
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        let viewController = CharacterDetailViewController()
+        viewController.character = charactersArray[indexPath.row]
+
+        navigationController?.pushViewController(viewController, animated: true)
+        tableView.deselectRow(at: indexPath, animated: true)
+    }
+}
