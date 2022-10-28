@@ -4,6 +4,9 @@
 ## Stack
 * UIKit
 * Alamofire
+* SnapKit
+* KingFisher
+* SwiftLint
 
 ## Screenshots
 ![alt text](Screenshots/image1.png "All characters(Page 1)")![alt text](Screenshots/image2.png "All characters(Page 3)")
