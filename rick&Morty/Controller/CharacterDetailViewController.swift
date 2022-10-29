@@ -7,15 +7,18 @@
 
 import UIKit
 import Kingfisher
+import SnapKit
 
 final class CharacterDetailViewController: UIViewController {
-    @IBOutlet weak var characterImageView: UIImageView!
-    @IBOutlet weak var nameLabel: UILabel!
-    @IBOutlet weak var statusView: UIView!
-    @IBOutlet weak var statusLabel: UILabel!
-    @IBOutlet weak var speciesLabel: UILabel!
-    @IBOutlet weak var locationLabel: UILabel!
-    @IBOutlet weak var episodesTableView: UITableView!
+    private let characterImageView: UIImageView = {
+        let imageView = UIImageView()
+        imageView.backgroundColor = .white
+        return imageView
+    }()
+    private let statusLabel = UILabel()
+    private let speciesLabel = UILabel()
+    private let locationLabel = UILabel()
+    private let episodesTableView = UITableView()
     
     var character: Characters.Character?
     private var episodes: [Characters.Episode] = [] {
@@ -23,7 +26,6 @@ final class CharacterDetailViewController: UIViewController {
             episodes.sort {$0.episode < $1.episode}
         }
     }
-    
     private let apiClient: ApiClient = ApiClientImpl()
 
     override func viewDidLoad() {
@@ -33,21 +35,95 @@ final class CharacterDetailViewController: UIViewController {
     }
     
     private func setupView() {
-        navigationItem.title = "Details"
+        guard let character else { return }
+        
         navigationController?.navigationBar.prefersLargeTitles = true
+        navigationItem.title = character.name
         
         view.backgroundColor = .white
         
-        if let newCharacter = character {
-            loadInfo(for: newCharacter)
-            loadEpisodes(for: newCharacter)
+        setupImageView()
+        setupLabels()
+        setupTableView()
+        
+        loadInfo(for: character)
+        loadEpisodes(for: character)
+    }
+    
+    private func setupImageView() {
+        view.addSubview(characterImageView)
+        
+        characterImageView.snp.makeConstraints { make in
+            make.top.equalTo(view.safeAreaLayoutGuide.snp.top).offset(20)
+            make.leading.trailing.equalToSuperview()
+            make.height.equalTo(240)
         }
+    }
+    
+    private func setupLabels() {
+        let statusText = "Status:"
+        let statusTitleLabel = createTitleLabel(withText: statusText, under: characterImageView)
+
+        let speciesText = "Species and gender:"
+        let speciesTitleLabel = createTitleLabel(withText: speciesText, under: statusTitleLabel)
+
+        let locationText = "Location:"
+        let locationTitleLabel = createTitleLabel(withText: locationText, under: speciesTitleLabel)
+
+        let titleLabels = [statusTitleLabel, speciesTitleLabel, locationTitleLabel]
+
+        for (index, label) in [statusLabel, speciesLabel, locationLabel].enumerated() {
+            label.font = .systemFont(ofSize: 16)
+            label.tintColor = .black
+            label.textAlignment = .right
+            
+            view.addSubview(label)
+
+            label.snp.makeConstraints { make in
+                make.top.equalTo(titleLabels[index].snp.top)
+                make.trailing.equalToSuperview().inset(20)
+                make.leading.equalTo(titleLabels[index].snp.trailing)
+            }
+        }
+    }
+    
+    private func setupTableView() {
+        let episodesText = "Episodes:"
+        let episodesTitleLabel = createTitleLabel(withText: episodesText, under: locationLabel)
+        
+        episodesTableView.register(UITableViewCell.self, forCellReuseIdentifier: "episodeCell")
+        episodesTableView.delegate = self
+        episodesTableView.dataSource = self
+        episodesTableView.backgroundColor = .white
+        
+        view.addSubview(episodesTableView)
+        
+        episodesTableView.snp.makeConstraints { make in
+            make.top.equalTo(episodesTitleLabel.snp.bottom).offset(10)
+            make.leading.trailing.bottom.equalToSuperview()
+        }
+    }
+    
+    private func createTitleLabel(withText text: String, under underView: UIView) -> UILabel {
+        let label = UILabel()
+        label.font = .boldSystemFont(ofSize: 18)
+        label.tintColor = .black
+        label.text = text
+        
+        view.addSubview(label)
+        
+        label.snp.makeConstraints { make in
+            make.top.equalTo(underView.snp.bottom).offset(20)
+            make.leading.equalToSuperview().offset(20)
+        }
+        
+        return label
     }
     
     private func loadInfo(for newCharacter: Characters.Character) {
         let imageUrl = URL(string: newCharacter.image)
-        let processor = DownsamplingImageProcessor(size: characterImageView.bounds.size)
-        |> RoundCornerImageProcessor(cornerRadius: 10)
+        let imageSize = CGSize(width: view.frame.size.width, height: 240)
+        let processor = DownsamplingImageProcessor(size: imageSize)
         characterImageView.kf.indicatorType = .activity
         characterImageView.kf.setImage(
             with: imageUrl,
@@ -58,20 +134,8 @@ final class CharacterDetailViewController: UIViewController {
                 .cacheOriginalImage
             ])
         
-        nameLabel.text = newCharacter.name
-        
-        var color: UIColor
-        switch newCharacter.status {
-        case .alive:
-            color = .green
-        case .dead:
-            color = .red
-        default:
-            color = .yellow
-        }
-        
-        statusView.backgroundColor = color
         statusLabel.text = newCharacter.status.rawValue
+        statusLabel.textColor = newCharacter.getStatusColor()
         speciesLabel.text = newCharacter.species
         locationLabel.text = newCharacter.location.name
     }
@@ -84,7 +148,7 @@ final class CharacterDetailViewController: UIViewController {
                     switch result {
                     case .success(let result):
                         episodes.append(result)
-                        episodesTableView?.reloadData()
+                        episodesTableView.reloadData()
                     case .failure(let error):
                         print(error.localizedDescription)
                     }
@@ -100,15 +164,12 @@ extension CharacterDetailViewController: UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "episodeCell")
-        if let cell {
-            let model = episodes[indexPath.row]
-            
-            cell.textLabel?.text = model.name
-            cell.detailTextLabel?.text = model.episode
-        }
+        guard let cell = tableView.dequeueReusableCell(withIdentifier: "episodeCell") else { return UITableViewCell() }
+
+        let model = episodes[indexPath.row]
+        cell.textLabel?.text = "\(model.name) - \(model.episode)"
                 
-        return cell ?? UITableViewCell()
+        return cell
     }
 }
 

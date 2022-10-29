@@ -5,7 +5,7 @@
 //  Created by Давид Тоноян  on 21.05.2021.
 //
 
-import Foundation
+import UIKit
 
 // MARK: - Characters
 struct Characters: Decodable {
@@ -14,7 +14,6 @@ struct Characters: Decodable {
 }
 
 extension Characters {
-    
     // MARK: - Info
     struct Info: Decodable {
         let next: String?
@@ -34,6 +33,20 @@ extension Characters {
         let episode: [String]
         let url: String
         let created: String
+        
+        func getStatusColor() -> UIColor {
+            let color: UIColor = {
+                switch status {
+                case .alive:
+                    return .green
+                case .dead:
+                    return .red
+                case .unknown:
+                    return .yellow
+                }
+            }()
+            return color
+        }
     }
 
     // MARK: - Location

@@ -13,8 +13,8 @@ final class CharacterTableViewCell: UITableViewCell {
         let view = UIView()
         view.backgroundColor = .white
         view.layer.cornerRadius = 10
-        view.layer.borderColor = UIColor.lightGray.cgColor
-        view.layer.borderWidth = 3
+        view.layer.borderColor = UIColor.black.cgColor
+        view.layer.borderWidth = 2
         return view
     }()
     let characterImageView: UIImageView = {
@@ -72,7 +72,6 @@ final class CharacterTableViewCell: UITableViewCell {
         characterImageView.snp.makeConstraints { make in
             make.top.leading.equalToSuperview().offset(10)
             make.bottom.equalToSuperview().inset(10)
-            make.width.height.equalTo(100)
         }
         
         characterNameLabel.snp.makeConstraints { make in
