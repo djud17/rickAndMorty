@@ -18,10 +18,10 @@ final class CharactersViewController: UIViewController {
     private var pageLabel = UILabel()
     
     private let apiClient: ApiClient = ApiClientImpl()
-    private let urlAllCharacters = UrlAdresses.allCharacters.rawValue
-    
     private let viewConfigurator = ViewConfigurator.shared.characterListVCViewConfigurator
+    private let errorController = ErrorController.shared
     
+    private let urlAllCharacters = UrlAdresses.allCharacters.rawValue
     private var charactersInfo = Characters.Info(next: "", prev: "")
     private var counter = 1 {
         didSet {
@@ -75,14 +75,9 @@ final class CharactersViewController: UIViewController {
     }
     
     private func showError(error: ApiError) {
-        let errorMessage = "Ошибка - \(error.localizedDescription)"
-        let alertController = UIAlertController(title: nil, message: errorMessage, preferredStyle: .actionSheet)
-        let alertReloadAction = UIAlertAction(title: "Reload", style: .default) { [unowned self] _ in
+        let alertController = errorController.createErrorController(error: error) { [unowned self] _ in
             loadData(from: urlAllCharacters)
         }
-        let alertCancelAction = UIAlertAction(title: "Cancel", style: .cancel)
-        alertController.addAction(alertReloadAction)
-        alertController.addAction(alertCancelAction)
         present(alertController, animated: true)
     }
     

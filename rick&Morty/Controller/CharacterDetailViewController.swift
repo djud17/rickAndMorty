@@ -23,8 +23,8 @@ final class CharacterDetailViewController: UIViewController {
         }
     }
     private let apiClient: ApiClient = ApiClientImpl()
-    
     private let viewConfigurator = ViewConfigurator.shared.characterDetailViewController
+    private let errorController = ErrorController.shared
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -117,16 +117,11 @@ final class CharacterDetailViewController: UIViewController {
     }
     
     private func showError(error: ApiError) {
-        let errorMessage = "Ошибка - \(error.localizedDescription)"
-        let alertController = UIAlertController(title: nil, message: errorMessage, preferredStyle: .actionSheet)
-        let alertReloadAction = UIAlertAction(title: "Reload", style: .default) { [unowned self] _ in
+        let alertController = errorController.createErrorController(error: error) { [unowned self] _ in
             guard let character else { return }
 
             loadEpisodes(for: character)
         }
-        let alertCancelAction = UIAlertAction(title: "Cancel", style: .cancel)
-        alertController.addAction(alertReloadAction)
-        alertController.addAction(alertCancelAction)
         present(alertController, animated: true)
     }
 }
