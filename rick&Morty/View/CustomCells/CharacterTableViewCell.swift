@@ -14,7 +14,7 @@ final class CharacterTableViewCell: UITableViewCell {
         view.backgroundColor = .white
         view.layer.cornerRadius = 10
         view.layer.borderColor = UIColor.black.cgColor
-        view.layer.borderWidth = 2
+        view.layer.borderWidth = 1
         return view
     }()
     let characterImageView: UIImageView = {

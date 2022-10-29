@@ -18,6 +18,8 @@ final class EpisodeDetailViewController: UIViewController {
     private var characters: [Characters.Character] = []
     
     private let apiClient: ApiClient = ApiClientImpl()
+    
+    private let viewConfigurator = ViewConfigurator.shared.episodeDetailViewConfigurator
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -44,67 +46,28 @@ final class EpisodeDetailViewController: UIViewController {
     private func setupLabels() {
         let episodeNameText = "Name:"
         let safeAreaTop = view.safeAreaLayoutGuide.snp.top
-        let episodeNameTitleLabel = createTitleLabel(withText: episodeNameText, under: safeAreaTop)
-
+        let episodeNameTitleLabel = viewConfigurator.createTitleLabel(withText: episodeNameText,
+                                                                      on: view,
+                                                                      under: safeAreaTop)
         let airDateText = "Air Date:"
-        let airDateTitleLabel = createTitleLabel(withText: airDateText, under: episodeNameTitleLabel.snp.bottom)
+        let airDateTitleLabel = viewConfigurator.createTitleLabel(withText: airDateText,
+                                                                  on: view,
+                                                                  under: episodeNameTitleLabel.snp.bottom)
 
         let titleLabels = [episodeNameTitleLabel, airDateTitleLabel]
-
-        for (index, label) in [episodeNameLabel, airDateLabel].enumerated() {
-            label.font = .systemFont(ofSize: 16)
-            label.tintColor = .black
-            label.textAlignment = .right
-            
-            view.addSubview(label)
-
-            label.snp.makeConstraints { make in
-                make.top.equalTo(titleLabels[index].snp.top)
-                make.trailing.equalToSuperview().inset(20)
-                make.leading.equalTo(titleLabels[index].snp.trailing)
-            }
-        }
-    }
-    
-    private func createTitleLabel(withText text: String, under underConstraint: ConstraintItem) -> UILabel {
-        let label = UILabel()
-        label.font = .boldSystemFont(ofSize: 18)
-        label.tintColor = .black
-        label.text = text
-        
-        view.addSubview(label)
-        
-        label.snp.makeConstraints { make in
-            make.top.equalTo(underConstraint).offset(20)
-            make.leading.equalToSuperview().offset(20)
-        }
-        
-        return label
+        let characterLabels = [episodeNameLabel, airDateLabel]
+        viewConfigurator.setupCharacterLabels(on: view, titleLabels: titleLabels, characterLabels: characterLabels)
     }
     
     private func setupCollectionView() {
         let charactersText = "Characters:"
-        let charactersTitleLabel = createTitleLabel(withText: charactersText, under: airDateLabel.snp.bottom)
+        let charactersTitleLabel = viewConfigurator.createTitleLabel(withText: charactersText,
+                                                                     on: view,
+                                                                     under: airDateLabel.snp.bottom)
         
-        let layout: UICollectionViewFlowLayout = UICollectionViewFlowLayout()
-        layout.sectionInset = UIEdgeInsets(top: 20, left: 10, bottom: 10, right: 10)
-        layout.itemSize = CGSize(width: 70, height: 70)
-        layout.scrollDirection = .vertical
-        
-        charactersCollectionView = UICollectionView(frame: CGRect(), collectionViewLayout: layout)
-        charactersCollectionView.register(CharacterCollectionViewCell.self, forCellWithReuseIdentifier: "characterCell")
-        charactersCollectionView.backgroundColor = .white
-        
+        charactersCollectionView = viewConfigurator.setupCollectionView(on: view, under: charactersTitleLabel)
         charactersCollectionView.dataSource = self
         charactersCollectionView.delegate = self
-        charactersCollectionView.alwaysBounceVertical = true
-        
-        view.addSubview(charactersCollectionView)
-        
-        charactersCollectionView.snp.makeConstraints { make in
-            make.top.equalTo(charactersTitleLabel.snp.bottom).offset(10)
-            make.leading.trailing.bottom.equalToSuperview()
-        }
     }
     
     private func loadCharacters(for newEpisode: Characters.Episode) {
@@ -117,11 +80,25 @@ final class EpisodeDetailViewController: UIViewController {
                         characters.append(result)
                         charactersCollectionView.reloadData()
                     case .failure(let error):
-                        print(error.localizedDescription)
+                        showError(error: error)
                     }
                 }
             }
         }
+    }
+    
+    private func showError(error: ApiError) {
+        let errorMessage = "Ошибка - \(error.localizedDescription)"
+        let alertController = UIAlertController(title: nil, message: errorMessage, preferredStyle: .actionSheet)
+        let alertReloadAction = UIAlertAction(title: "Reload", style: .default) { [unowned self] _ in
+            guard let episode else { return }
+
+            loadCharacters(for: episode)
+        }
+        let alertCancelAction = UIAlertAction(title: "Cancel", style: .cancel)
+        alertController.addAction(alertReloadAction)
+        alertController.addAction(alertCancelAction)
+        present(alertController, animated: true)
     }
 }
 
@@ -138,6 +115,12 @@ extension EpisodeDetailViewController: UICollectionViewDataSource {
         }
         let character = characters[indexPath.row]
         let imageUrl = URL(string: character.image)
+        setImage(toCell: cell, fromUrl: imageUrl)
+        
+        return cell
+    }
+    
+    private func setImage(toCell cell: CharacterCollectionViewCell, fromUrl imageUrl: URL?) {
         let imageSize = CGSize(width: 70, height: 70)
         let processor = DownsamplingImageProcessor(size: imageSize)
         |> RoundCornerImageProcessor(cornerRadius: 10)
@@ -150,8 +133,6 @@ extension EpisodeDetailViewController: UICollectionViewDataSource {
                 .transition(.fade(1)),
                 .cacheOriginalImage
             ])
-        
-        return cell
     }
 }
 

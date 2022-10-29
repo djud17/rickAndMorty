@@ -10,15 +10,11 @@ import Kingfisher
 import SnapKit
 
 final class CharacterDetailViewController: UIViewController {
-    private let characterImageView: UIImageView = {
-        let imageView = UIImageView()
-        imageView.backgroundColor = .white
-        return imageView
-    }()
+    private var characterImageView = UIImageView()
     private let statusLabel = UILabel()
     private let speciesLabel = UILabel()
     private let locationLabel = UILabel()
-    private let episodesTableView = UITableView()
+    private var episodesTableView = UITableView()
     
     var character: Characters.Character?
     private var episodes: [Characters.Episode] = [] {
@@ -27,6 +23,8 @@ final class CharacterDetailViewController: UIViewController {
         }
     }
     private let apiClient: ApiClient = ApiClientImpl()
+    
+    private let viewConfigurator = ViewConfigurator.shared.characterDetailViewController
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -42,7 +40,7 @@ final class CharacterDetailViewController: UIViewController {
         
         view.backgroundColor = .white
         
-        setupImageView()
+        characterImageView = viewConfigurator.setupImageView(on: view)
         setupLabels()
         setupTableView()
         
@@ -50,74 +48,35 @@ final class CharacterDetailViewController: UIViewController {
         loadEpisodes(for: character)
     }
     
-    private func setupImageView() {
-        view.addSubview(characterImageView)
-        
-        characterImageView.snp.makeConstraints { make in
-            make.top.equalTo(view.safeAreaLayoutGuide.snp.top).offset(20)
-            make.leading.trailing.equalToSuperview()
-            make.height.equalTo(240)
-        }
-    }
-    
     private func setupLabels() {
         let statusText = "Status:"
-        let statusTitleLabel = createTitleLabel(withText: statusText, under: characterImageView)
-
+        let statusTitleLabel = viewConfigurator.createTitleLabel(withText: statusText,
+                                                                 on: view,
+                                                                 under: characterImageView)
         let speciesText = "Species and gender:"
-        let speciesTitleLabel = createTitleLabel(withText: speciesText, under: statusTitleLabel)
-
+        let speciesTitleLabel = viewConfigurator.createTitleLabel(withText: speciesText,
+                                                                  on: view,
+                                                                  under: statusTitleLabel)
         let locationText = "Location:"
-        let locationTitleLabel = createTitleLabel(withText: locationText, under: speciesTitleLabel)
-
+        let locationTitleLabel = viewConfigurator.createTitleLabel(withText: locationText,
+                                                                   on: view,
+                                                                   under: speciesTitleLabel)
         let titleLabels = [statusTitleLabel, speciesTitleLabel, locationTitleLabel]
-
-        for (index, label) in [statusLabel, speciesLabel, locationLabel].enumerated() {
-            label.font = .systemFont(ofSize: 16)
-            label.tintColor = .black
-            label.textAlignment = .right
-            
-            view.addSubview(label)
-
-            label.snp.makeConstraints { make in
-                make.top.equalTo(titleLabels[index].snp.top)
-                make.trailing.equalToSuperview().inset(20)
-                make.leading.equalTo(titleLabels[index].snp.trailing)
-            }
-        }
+        let characterLabels = [statusLabel, speciesLabel, locationLabel]
+        viewConfigurator.setupCharacterLabels(on: view,
+                                              titleLabels: titleLabels,
+                                              characterLabels: characterLabels)
     }
     
     private func setupTableView() {
         let episodesText = "Episodes:"
-        let episodesTitleLabel = createTitleLabel(withText: episodesText, under: locationLabel)
+        let episodesTitleLabel = viewConfigurator.createTitleLabel(withText: episodesText,
+                                                                   on: view,
+                                                                   under: locationLabel)
         
-        episodesTableView.register(UITableViewCell.self, forCellReuseIdentifier: "episodeCell")
+        episodesTableView = viewConfigurator.setupTableView(on: view, under: episodesTitleLabel)
         episodesTableView.delegate = self
         episodesTableView.dataSource = self
-        episodesTableView.backgroundColor = .white
-        
-        view.addSubview(episodesTableView)
-        
-        episodesTableView.snp.makeConstraints { make in
-            make.top.equalTo(episodesTitleLabel.snp.bottom).offset(10)
-            make.leading.trailing.bottom.equalToSuperview()
-        }
-    }
-    
-    private func createTitleLabel(withText text: String, under underView: UIView) -> UILabel {
-        let label = UILabel()
-        label.font = .boldSystemFont(ofSize: 18)
-        label.tintColor = .black
-        label.text = text
-        
-        view.addSubview(label)
-        
-        label.snp.makeConstraints { make in
-            make.top.equalTo(underView.snp.bottom).offset(20)
-            make.leading.equalToSuperview().offset(20)
-        }
-        
-        return label
     }
     
     private func loadInfo(for newCharacter: Characters.Character) {
@@ -150,11 +109,25 @@ final class CharacterDetailViewController: UIViewController {
                         episodes.append(result)
                         episodesTableView.reloadData()
                     case .failure(let error):
-                        print(error.localizedDescription)
+                        showError(error: error)
                     }
                 }
             }
         }
+    }
+    
+    private func showError(error: ApiError) {
+        let errorMessage = "Ошибка - \(error.localizedDescription)"
+        let alertController = UIAlertController(title: nil, message: errorMessage, preferredStyle: .actionSheet)
+        let alertReloadAction = UIAlertAction(title: "Reload", style: .default) { [unowned self] _ in
+            guard let character else { return }
+
+            loadEpisodes(for: character)
+        }
+        let alertCancelAction = UIAlertAction(title: "Cancel", style: .cancel)
+        alertController.addAction(alertReloadAction)
+        alertController.addAction(alertCancelAction)
+        present(alertController, animated: true)
     }
 }
 

@@ -14,13 +14,16 @@ struct Characters: Decodable {
 }
 
 extension Characters {
+    
     // MARK: - Info
+    
     struct Info: Decodable {
         let next: String?
         let prev: String?
     }
 
     // MARK: - Result
+    
     struct Character: Decodable {
         let id: Int
         let name: String
@@ -50,16 +53,21 @@ extension Characters {
     }
 
     // MARK: - Location
+    
     struct Location: Decodable {
         let name: String
         let url: String
     }
+    
+    // MARK: - Status
 
     enum Status: String, Decodable {
         case alive = "Alive"
         case dead = "Dead"
         case unknown = "unknown"
     }
+    
+    // MARK: - Episode
 
     struct Episode: Decodable {
         let id: Int
@@ -67,11 +75,5 @@ extension Characters {
         let characters: [String]
         let url: String
         let created: String
-
-        enum CodingKeys: String, CodingKey {
-            case id, name
-            case airDate = "air_date"
-            case episode, characters, url, created
-        }
     }
 }

@@ -9,7 +9,7 @@
 /* Begin PBXBuildFile section */
 		25A18D9C290C356400C53521 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 25A18D9B290C356400C53521 /* SceneDelegate.swift */; };
 		25EBAD8A265827E2009C0A37 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 25EBAD89265827E2009C0A37 /* AppDelegate.swift */; };
-		25EBAD8E265827E2009C0A37 /* CharacterViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 25EBAD8D265827E2009C0A37 /* CharacterViewController.swift */; };
+		25EBAD8E265827E2009C0A37 /* CharactersViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 25EBAD8D265827E2009C0A37 /* CharactersViewController.swift */; };
 		25EBAD93265827EA009C0A37 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 25EBAD92265827EA009C0A37 /* Assets.xcassets */; };
 		25EBAD96265827EA009C0A37 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 25EBAD94265827EA009C0A37 /* LaunchScreen.storyboard */; };
 		25EBADA126582A35009C0A37 /* CharacterModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 25EBADA026582A35009C0A37 /* CharacterModel.swift */; };
@@ -18,6 +18,7 @@
 		25EBADA826583BE9009C0A37 /* CharacterDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 25EBADA726583BE9009C0A37 /* CharacterDetailViewController.swift */; };
 		25EBADAA265850ED009C0A37 /* EpisodeDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 25EBADA9265850ED009C0A37 /* EpisodeDetailViewController.swift */; };
 		25EBADAC2658553A009C0A37 /* CharacterCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 25EBADAB2658553A009C0A37 /* CharacterCollectionViewCell.swift */; };
+		25F9A6FE290DC4AF00AA61CE /* ViewConfigurator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 25F9A6FD290DC4AF00AA61CE /* ViewConfigurator.swift */; };
 		9072A015BA73B89927EDCEDD /* Pods_rick_Morty.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6B11F20DB84226A004C17DEB /* Pods_rick_Morty.framework */; };
 /* End PBXBuildFile section */
 
@@ -25,7 +26,7 @@
 		25A18D9B290C356400C53521 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
 		25EBAD86265827E2009C0A37 /* rick&Morty.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "rick&Morty.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		25EBAD89265827E2009C0A37 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
-		25EBAD8D265827E2009C0A37 /* CharacterViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CharacterViewController.swift; sourceTree = "<group>"; };
+		25EBAD8D265827E2009C0A37 /* CharactersViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CharactersViewController.swift; sourceTree = "<group>"; };
 		25EBAD92265827EA009C0A37 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		25EBAD95265827EA009C0A37 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		25EBAD97265827EA009C0A37 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -35,6 +36,7 @@
 		25EBADA726583BE9009C0A37 /* CharacterDetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CharacterDetailViewController.swift; sourceTree = "<group>"; };
 		25EBADA9265850ED009C0A37 /* EpisodeDetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EpisodeDetailViewController.swift; sourceTree = "<group>"; };
 		25EBADAB2658553A009C0A37 /* CharacterCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CharacterCollectionViewCell.swift; sourceTree = "<group>"; };
+		25F9A6FD290DC4AF00AA61CE /* ViewConfigurator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewConfigurator.swift; sourceTree = "<group>"; };
 		27E38517E70C9DDF92F3A50B /* Pods-rick&Morty.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-rick&Morty.debug.xcconfig"; path = "Target Support Files/Pods-rick&Morty/Pods-rick&Morty.debug.xcconfig"; sourceTree = "<group>"; };
 		6B11F20DB84226A004C17DEB /* Pods_rick_Morty.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_rick_Morty.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		7BA7B58F6DCF9BFBBCF0DE3E /* Pods-rick&Morty.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-rick&Morty.release.xcconfig"; path = "Target Support Files/Pods-rick&Morty/Pods-rick&Morty.release.xcconfig"; sourceTree = "<group>"; };
@@ -73,12 +75,11 @@
 		25EBAD88265827E2009C0A37 /* rick&Morty */ = {
 			isa = PBXGroup;
 			children = (
+				25F9A6F8290DBA5200AA61CE /* Delegates */,
 				25EBADA226582C0B009C0A37 /* Services */,
 				25EBAD9D2658285C009C0A37 /* Model */,
 				25EBAD9E26582862009C0A37 /* View */,
 				25EBAD9F2658286B009C0A37 /* Controller */,
-				25EBAD89265827E2009C0A37 /* AppDelegate.swift */,
-				25A18D9B290C356400C53521 /* SceneDelegate.swift */,
 				25EBAD92265827EA009C0A37 /* Assets.xcassets */,
 				25EBAD94265827EA009C0A37 /* LaunchScreen.storyboard */,
 				25EBAD97265827EA009C0A37 /* Info.plist */,
@@ -97,8 +98,8 @@
 		25EBAD9E26582862009C0A37 /* View */ = {
 			isa = PBXGroup;
 			children = (
-				25EBADA526583194009C0A37 /* CharacterTableViewCell.swift */,
-				25EBADAB2658553A009C0A37 /* CharacterCollectionViewCell.swift */,
+				25F9A6FF290DD00A00AA61CE /* CustomCells */,
+				25F9A6FD290DC4AF00AA61CE /* ViewConfigurator.swift */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -106,7 +107,7 @@
 		25EBAD9F2658286B009C0A37 /* Controller */ = {
 			isa = PBXGroup;
 			children = (
-				25EBAD8D265827E2009C0A37 /* CharacterViewController.swift */,
+				25EBAD8D265827E2009C0A37 /* CharactersViewController.swift */,
 				25EBADA726583BE9009C0A37 /* CharacterDetailViewController.swift */,
 				25EBADA9265850ED009C0A37 /* EpisodeDetailViewController.swift */,
 			);
@@ -119,6 +120,24 @@
 				25EBADA326582C1A009C0A37 /* ApiClient.swift */,
 			);
 			path = Services;
+			sourceTree = "<group>";
+		};
+		25F9A6F8290DBA5200AA61CE /* Delegates */ = {
+			isa = PBXGroup;
+			children = (
+				25EBAD89265827E2009C0A37 /* AppDelegate.swift */,
+				25A18D9B290C356400C53521 /* SceneDelegate.swift */,
+			);
+			path = Delegates;
+			sourceTree = "<group>";
+		};
+		25F9A6FF290DD00A00AA61CE /* CustomCells */ = {
+			isa = PBXGroup;
+			children = (
+				25EBADA526583194009C0A37 /* CharacterTableViewCell.swift */,
+				25EBADAB2658553A009C0A37 /* CharacterCollectionViewCell.swift */,
+			);
+			path = CustomCells;
 			sourceTree = "<group>";
 		};
 		ACDE6B0AADD86F1356FA0BAF /* Pods */ = {
@@ -270,7 +289,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				25EBAD8E265827E2009C0A37 /* CharacterViewController.swift in Sources */,
+				25EBAD8E265827E2009C0A37 /* CharactersViewController.swift in Sources */,
+				25F9A6FE290DC4AF00AA61CE /* ViewConfigurator.swift in Sources */,
 				25EBADA126582A35009C0A37 /* CharacterModel.swift in Sources */,
 				25A18D9C290C356400C53521 /* SceneDelegate.swift in Sources */,
 				25EBAD8A265827E2009C0A37 /* AppDelegate.swift in Sources */,
