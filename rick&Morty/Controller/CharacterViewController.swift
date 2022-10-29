@@ -121,7 +121,7 @@ final class CharacterViewController: UIViewController {
     @objc private func nextBtnTapped() {
         if let nextUrl = charactersInfo.next {
             loadData(from: nextUrl)
-            //charactersTableView.scrollToRow(at: IndexPath(row: 0, section: 0), at: .top, animated: true)
+            charactersTableView.scrollToRow(at: IndexPath(row: 0, section: 0), at: .top, animated: true)
             counter += 1
             pageLabel.text = String(counter)
         }
@@ -130,7 +130,7 @@ final class CharacterViewController: UIViewController {
     @objc private func previousBtnTapped() {
         if let prevUrl = charactersInfo.prev {
             loadData(from: prevUrl)
-            //charactersTableView.scrollToRow(at: IndexPath(row: 0, section: 0), at: .top, animated: true)
+            charactersTableView.scrollToRow(at: IndexPath(row: 0, section: 0), at: .top, animated: true)
             counter -= 1
             pageLabel.text = String(counter)
         }
