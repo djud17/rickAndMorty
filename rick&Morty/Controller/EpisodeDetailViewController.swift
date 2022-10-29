@@ -7,7 +7,6 @@
 
 import UIKit
 import Kingfisher
-import SnapKit
 
 final class EpisodeDetailViewController: UIViewController {
     private let episodeNameLabel = UILabel()

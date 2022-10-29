@@ -49,10 +49,12 @@ final class CharactersViewController: UIViewController {
         
         pageLabel = viewConfigurator.setupPageCounterLabel(withText: String(counter))
         
-        let previousPageButton = viewConfigurator.setupNavigationButton(withText: "Previous",
-                                                                        andAction: #selector(previousBtnTapped))
-        let nextPageButton = viewConfigurator.setupNavigationButton(withText: "Next",
-                                                                    andAction: #selector(nextBtnTapped))
+        let previousPageButton = viewConfigurator.setupNavigationButton(withText: "Previous")
+        previousPageButton.addTarget(self, action: #selector(previousBtnTapped), for: .touchUpInside)
+        
+        let nextPageButton = viewConfigurator.setupNavigationButton(withText: "Next")
+        nextPageButton.addTarget(self, action: #selector(nextBtnTapped), for: .touchUpInside)
+        
         let navigationArray = [previousPageButton, pageLabel, nextPageButton]
         pageNavigationStackView = viewConfigurator.setupPageNavigation(on: view,
                                                                        under: charactersTableView,

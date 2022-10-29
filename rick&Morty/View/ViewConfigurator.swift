@@ -54,7 +54,7 @@ final class CharacterListVCViewConfigurator {
         return stackView
     }
     
-    func setupNavigationButton(withText text: String, andAction action: Selector) -> UIButton {
+    func setupNavigationButton(withText text: String) -> UIButton {
         let button = UIButton()
         button.setTitle(text, for: .normal)
         button.setTitleColor(.black, for: .normal)
@@ -62,7 +62,6 @@ final class CharacterListVCViewConfigurator {
         button.layer.borderWidth = 1
         button.layer.borderColor = UIColor.black.cgColor
         button.layer.cornerRadius = 10
-        button.addTarget(self, action: action, for: .touchUpInside)
         return button
     }
     

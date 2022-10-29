@@ -7,7 +7,6 @@
 
 import UIKit
 import Kingfisher
-import SnapKit
 
 final class CharacterDetailViewController: UIViewController {
     private var characterImageView = UIImageView()
